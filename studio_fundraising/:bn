@@ -1,10 +1,6 @@
-require_relative 'fundable'
-
 class Project
-	include Fundable
-
-	attr_accessor :name, :pledges, :funds
-	attr_reader :target
+	attr_accessor :name, :pledges
+	attr_reader :funds, :target
 
 	def initialize(name, target_fund, init_fund=0)
 		@name = name.capitalize
@@ -15,14 +11,36 @@ class Project
 
   def add_pledge(pledge)
     @pledges[pledge.name] += pledge.amount
-		add_funds(pledge.amount)
+		@funds += pledge.amount
   end
 
   def each_pledge
     @pledges.each { |name, amount| yield(name, amount) }
   end
 
-		def to_s
+	def needed
+		@target  - @funds
+	end
+
+	def funded?
+		needed <= 0
+	end
+
+	def add
+		@funds += 25
+		puts "Project #{@name} got more funds!"
+	end
+
+	def remove
+		@funds -= 15
+		puts "Project #{@name} lost some funds!"
+	end
+
+	def <=>(other)
+		needed <=> other.needed
+	end
+
+	def to_s
 		"Project #{@name} has $#{@funds} in funding towards a goal of $#{@target}."
 	end
 end
